@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/router"; // ⬅ Add for navigation
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -6,6 +7,7 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [currentWord, setCurrentWord] = useState("playing");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter(); // ⬅ Hook for navigation
 
   // Cycling words for the blank space
   useEffect(() => {
@@ -55,9 +57,14 @@ export default function Home() {
       });
 
       const data = await response.json();
-      setMessage(`✅ ${data.message}`);
+
+      if (response.ok) {
+        router.push(`/results?status=success`); // ⬅ Redirect to results page
+      } else {
+        router.push(`/results?status=failure`); // ⬅ Redirect with failure
+      }
     } catch (error) {
-      setMessage("🚨 Upload failed. Try again.");
+      router.push(`/results?status=failure`); // ⬅ Redirect if error
     } finally {
       setUploading(false);
     }
