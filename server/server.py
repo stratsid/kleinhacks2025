@@ -15,10 +15,8 @@ CORS(app)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Set up your OpenAI API key from environment variables
-# Load environment variables from .env file
+# Load environment variables from .env file and set OpenAI API key
 load_dotenv()
-
 openai.api_key = os.getenv("OPENAI_KEY")
 
 def transcribe_audio(filepath):
@@ -60,15 +58,23 @@ def get_bpm(filepath):
 
 def evaluate_track(transcription, bpm):
     """
-    Sends a prompt to the OpenAI 4o mini model to evaluate the song.
-    The prompt asks for a JSON response containing a boolean 'success' flag and an 'explanation'.
+    Sends a prompt to the OpenAI model to evaluate the song.
+    The prompt asks for a JSON response with the following keys:
+      - 'success': a boolean indicating if the song is likely to succeed.
+      - 'placeholder1': a brief comparison of the input track's BPM with the average BPM of the current top 10 popular songs.
+      - 'placeholder2': a brief comparison of the most common words in the transcript (excluding common articles) with those in popular songs.
+      - 'placeholder3': a brief comparison of the main themes in the transcript with the themes of the top songs.
+      - 'summary': an overall summary explaining why the track is expected to succeed or fail.
     """
     prompt = (
         f"Evaluate the following track for its potential success in the music market. "
         f"The track has a BPM of {bpm} and the lyrics/transcript are: {transcription}. "
-        f"Based on the properties of successful songs, please provide a JSON response with two keys: "
-        f"'success' (a boolean indicating if the song is likely to succeed) and 'explanation' (a comparison "
-        f"to characteristics of successful tracks that supports your claim)."
+        "Based on the characteristics of successful songs, please provide a JSON response with the following keys: "
+        "'success': a boolean indicating if the song is likely to succeed; "
+        "'placeholder1': a brief comparison of the BPM of the input audio with the average BPM of the current top 10 popular songs; "
+        "'placeholder2': a brief comparison of the most common words in the transcript (excluding common articles) with those in popular songs; "
+        "'placeholder3': a brief comparison of the main themes in the transcript with the themes of the current top songs; "
+        "and 'summary': an overall summary explaining why the track is expected to succeed or fail."
     )
     
     result = ""  # Initialize result to ensure it's defined in case of error
@@ -96,7 +102,7 @@ def evaluate_track(transcription, bpm):
     except Exception as e:
         print(f"Error evaluating track: {e}")
         print("Full raw response was:", result)
-        return {"success": False, "explanation": "Evaluation failed due to an error."}
+        return {"success": False, "placeholder1": "", "placeholder2": "", "placeholder3": "", "summary": "Evaluation failed due to an error."}
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
