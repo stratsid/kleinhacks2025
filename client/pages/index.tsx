@@ -59,12 +59,14 @@ export default function Home() {
       const data = await response.json();
 
       if (response.ok) {
-        router.push(`/results?status=success`); // ⬅ Redirect to results page
+        // Save the evaluation data in localStorage for the results page
+        localStorage.setItem("evaluationData", JSON.stringify(data.evaluation));
+        router.push(`/results?status=success`);
       } else {
-        router.push(`/results?status=failure`); // ⬅ Redirect with failure
+        router.push(`/results?status=failure`);
       }
     } catch (error) {
-      router.push(`/results?status=failure`); // ⬅ Redirect if error
+      router.push(`/results?status=failure`);
     } finally {
       setUploading(false);
     }

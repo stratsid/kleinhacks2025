@@ -61,20 +61,24 @@ def evaluate_track(transcription, bpm):
     Sends a prompt to the OpenAI model to evaluate the song.
     The prompt asks for a JSON response with the following keys:
       - 'success': a boolean indicating if the song is likely to succeed.
-      - 'placeholder1': a brief comparison of the input track's BPM with the average BPM of the current top 10 popular songs.
-      - 'placeholder2': a brief comparison of the most common words in the transcript (excluding common articles) with those in popular songs.
-      - 'placeholder3': a brief comparison of the main themes in the transcript with the themes of the top songs.
-      - 'summary': an overall summary explaining why the track is expected to succeed or fail.
+      - 'placeholder1': a one-line factual comparison of BPM, formatted exactly as "AVG BPM: {avg bpm}, Your BPM: {your bpm}" (under 50 characters).
+      - 'placeholder2': a concise comparison of common mainstream words (excluding common articles) versus the transcript's words, formatted as:
+           "Common Mainstream Words: {mainstream words}\nYour Words: {your words}"
+      - 'placeholder3': a concise comparison of common mainstream themes versus the transcript's themes, formatted as:
+           "Common themes: {mainstream themes}\nYour themes: {your themes}"
+      - 'summary': an in-depth explanation detailing why the track is expected to succeed or fail.
     """
     prompt = (
         f"Evaluate the following track for its potential success in the music market. "
-        f"The track has a BPM of {bpm} and the lyrics/transcript are: {transcription}. "
-        "Based on the characteristics of successful songs, please provide a JSON response with the following keys: "
-        "'success': a boolean indicating if the song is likely to succeed; "
-        "'placeholder1': a brief comparison of the BPM of the input audio with the average BPM of the current top 10 popular songs; "
-        "'placeholder2': a brief comparison of the most common words in the transcript (excluding common articles) with those in popular songs; "
-        "'placeholder3': a brief comparison of the main themes in the transcript with the themes of the current top songs; "
-        "and 'summary': an overall summary explaining why the track is expected to succeed or fail."
+        f"The track has a BPM of {bpm} and the transcript is: {transcription}. "
+        "Based on characteristics of successful songs, please provide a JSON response with the following keys: "
+        "'success': boolean; "
+        "'placeholder1': a one-line factual comparison of BPM, formatted exactly as 'AVG BPM: {avg bpm}, Your BPM: {your bpm}' (under 50 characters); "
+        "'placeholder2': a concise comparison of common mainstream words (excluding common articles) versus the transcript's words, "
+        "formatted as 'Common Mainstream Words: {mainstream words}\\nYour Words: {your words}'; "
+        "'placeholder3': a concise comparison of common mainstream themes versus the transcript's themes, "
+        "formatted as 'Common themes: {mainstream themes}\\nYour themes: {your themes}'; "
+        "and 'summary': an in-depth explanation of why the track is expected to succeed or fail."
     )
     
     result = ""  # Initialize result to ensure it's defined in case of error
